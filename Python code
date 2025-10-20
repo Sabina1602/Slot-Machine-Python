@@ -1,0 +1,105 @@
+import random  #importing module to use random.choice function here
+
+symbols = ["🍒", "🍋", "🔔", "⭐", "💎"]
+stake = 5
+minimum_balance = stake #to play a player must have at least balance equal to stake ($5)
+is_running = True #for running while loop later
+your_balance = 0 #current balance which will be topped-up later
+
+def current_balance(your_balance):
+    print(f"Your balance is: ${your_balance:.2f}") #demonstrates the initial balance when you start game
+
+def top_up(your_balance):  #function for topping-up the balance
+    while True:
+        top_up_amount = float(input("Top-up your balance: "))
+        if top_up_amount <= 0: #gives error if negative or zero number is entered
+            print("Entry must be positive or non-zero!")
+        else:
+            your_balance += top_up_amount #in case entry is correct it adds the amount
+            return your_balance #is saved to use not only locally, but also later in while loop
+
+
+def withdraw(your_balance): #function to withdraw money at the end of the game
+    withdraw_amount = float(input("Withdraw your balance: "))
+    if withdraw_amount > your_balance: #gives error if player wants to withdraw more than he/she has
+        print("Insufficient balance")
+        return 0
+    elif withdraw_amount <= 0: #gives error if negative or zero number is entered
+        print("Amount cannot be negative. Try again.")
+        return 0
+    else:
+        return withdraw_amount #if everything is correct, withdraws money
+
+def spins(): #function executing random choices as slots work
+    # random choice
+    reel = [random.choice(symbols) for _ in range(3)]
+    return reel
+
+
+def main():  #logic of slots
+    global is_running, your_balance   #as reference to those variables
+
+    while is_running:  #works until player wants to play
+        submit = input("Press P to play or Q to quit: ").lower()
+        print("GOOD LUCK!!!")
+        print()
+
+        if submit == "p":
+            if your_balance < stake:  #player must have minimum stake on balance
+                print("Top-up the balance! Insufficient amount!")
+                your_balance = top_up(your_balance)
+                continue
+            else: #if she/he has, game continues
+                #our stake is $5
+                your_balance -= stake
+                reel = spins()
+
+                #simple logic for prizes I set
+                if reel[0] == reel[1] == reel[2]:
+                    print(reel)
+                    print("!!!JACKPOT!!! YOU WON 20$!!!")
+                    your_balance += 20
+                    print(f"Your balance is ${your_balance}")
+
+                elif reel[0] == reel[1] or reel[1] == reel[2]:
+                    print(reel)
+                    print("YOUR PRIZE IS 5$")
+                    your_balance += 5
+                    print(f"Your balance is ${your_balance}")
+
+                elif reel[0] == reel[2]:
+                    print(reel)
+                    print("WONDERFUL! YOU WON 1$")
+                    your_balance += 1
+                    print(f"Your balance is ${your_balance}")
+
+                else:
+                    print(reel)
+                    print("YOU LOST!!!")
+
+        elif submit == "q": #in case player wants to quit, while loop stops (breaks)
+            is_running = False
+            print("Thank you for the game!")
+
+            while True: #when player wants to withdraw money, loop checks if conditions satisfied
+                withdrawal = input("Do you want to withdraw amount? y/n: ").lower()
+                if withdrawal == "y":
+                    amount = withdraw (your_balance)
+                    if amount > 0:
+                        your_balance -= amount
+                        print(f"Withdrawal successful! Remaining balance: ${your_balance:.2f}")
+                        break
+                    else: #if amount is insufficient, it will return condition again
+                        print("Try withdrawing again!")
+
+                elif withdrawal == "n":
+                    print("Okay, exiting without withdrawal.")
+                    break
+                else: #gives error in case player enters any other letters
+                    print("Answer should be either 'y' or 'n'.")
+
+        else: #refers to if condition related to p/q
+            print("Invalid entry!")
+
+if __name__ == "__main__": #saves the code above if I import it 
+    main()
